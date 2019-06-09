@@ -1,1 +1,1 @@
-web: gunicorn app:ApiServer2
+web: gunicorn ApiServer2:app
