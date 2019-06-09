@@ -8,14 +8,14 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 users = ["Abhimanyu_Yadav","Adarsh_Thompson","Ajit_Menon","Bhaskar_Ghatak","Dinesh_C","Jubi_jose_Jose","Mohit_Panwar","Nishant_Kumar3","Nisha_Handa","Sabarinath_B","Sachin_Juneja","Smitha_Karthik","Vamsi_V_Krishna","Veena_Chandrashekhar","Zeeshan_Faisal"]
 
-def PlotUserData(data, name):
+def PlotUserData(data, name, type, value):
 	category = list(map(lambda x: data[x]['Type'], data))
 	hours = list(map(lambda x: data[x]['Duration'], data))
 
 	fig1, ax1 = plt.subplots()
 	ax1.pie(hours, labels=category, autopct='%1.1f%%', shadow=True, startangle=90)
 	ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-	fileName = 'C:\My_Files\Projects\SharkTank\DemoApp\{}.png'.format(name)
+	fileName = 'C:\My_Files\Projects\SharkTank\DemoApp\TimeWisePlots\{}-{}-{}.png'.format(name, type, value)
 	fig1.savefig(fileName)
 	return fileName
 
@@ -26,7 +26,7 @@ def fy():
 @app.route('/getAvailableUsers')
 @cross_origin()
 def GetAvailableUsers():
-	return jsonify(users)
+	return jsonify({"Users": users})
 
 @app.route('/getUserDataRange')
 @cross_origin()
@@ -54,7 +54,7 @@ def GetUserDataPlot():
 	if name in users:
 		userData = GroupBy(type, value, name)
 		return jsonify({
-			"imageLocation": PlotUserData(userData['CatData'], name),
+			"imageLocation": PlotUserData(userData['CatData'], name, type, value),
 			"isDataValid": userData["isDataValid"]
 		})
 
