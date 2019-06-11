@@ -6,7 +6,8 @@ from GroupByCat2 import GroupBy, GetUserInfo
 app = Flask('myApi')
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-users = ["Abhimanyu_Yadav","Adarsh_Thompson","Ajit_Menon","Bhaskar_Ghatak","Dinesh_C","Jubi_jose_Jose","Mohit_Panwar","Nishant_Kumar3","Nisha_Handa","Sabarinath_B","Sachin_Juneja","Smitha_Karthik","Vamsi_V_Krishna","Veena_Chandrashekhar","Zeeshan_Faisal"]
+# users = ["Abhimanyu_Yadav","Adarsh_Thompson","Ajit_Menon","Bhaskar_Ghatak","Dinesh_C","Jubi_jose_Jose","Mohit_Panwar","Nishant_Kumar3","Nisha_Handa","Sabarinath_B","Sachin_Juneja","Smitha_Karthik","Vamsi_V_Krishna","Veena_Chandrashekhar","Zeeshan_Faisal"]
+users = ["Bhaskar_Ghatak","Dinesh_C","Mohit_Panwar"]
 
 def PlotUserData(data, name, type, value):
 	category = list(map(lambda x: data[x]['Type'], data))
@@ -64,8 +65,10 @@ def GetUserData():
 	name = request.args['name']
 	type = request.args['type']
 	value = request.args['value']
+	mock = True if request.args['mock'] == "true" else False
+	print(mock)
 	if name in users:
-		userData = GroupBy(type, value, name)
+		userData = GroupBy(type, value, name, mock)
 		return jsonify(userData)
 
 if __name__ == '__main__':

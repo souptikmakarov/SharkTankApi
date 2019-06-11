@@ -1,6 +1,13 @@
 import json
+from random import randrange
 
-def GroupBy(type, value, name):
+def perc(val, total):
+    return (val / total) * 100
+
+def randomize(weight, r, val=0):
+    return randrange(weight-r+val, weight+r+val)
+
+def GroupBy(type, value, name, mock=True):
     userCategorizedFile = "CategorizedV2/{}.json".format(name)
     categorizedFile = open(userCategorizedFile, encoding='utf-8')
     categorizedMeetingData = json.load(categorizedFile)
@@ -29,6 +36,11 @@ def GroupBy(type, value, name):
             "Duration": 0,
             "Count": 0,
             "Type": "Training"
+        },
+        5: {
+            "Duration": 0,
+            "Count": 0,
+            "Type": "Tool"
         }
     }
     for meeting in categorizedMeetingData:
@@ -37,16 +49,47 @@ def GroupBy(type, value, name):
             catResult[meeting["CategoryId"]]["Duration"] += meeting["Duration"]
 
     isDataValid = True
-    for x in range(4):
+
+    total = 0
+    for x in range(6):
         v = catResult[x]
-        if ((v["Type"] == "SalesMeeting" and v["Duration"] > 30)
-                or (v["Type"] == "TeamMeeting" and v["Duration"] > 40)
-                or (v["Type"] == "Vacations" and v["Duration"] > 10)
-                or (v["Type"] == "TeamActivity" and v["Duration"] > 10)
-                or (v["Type"] == "Training" and v["Duration"] > 10)):
-            isDataValid = isDataValid and True
-        else:
-            isDataValid = isDataValid and False
+        total += v["Duration"]
+
+    if total == 0:
+        if type == "Day":
+            total = 10
+        elif type == "Week":
+            total = 70
+        elif type == "Month":
+            total = 200
+        elif type == "Year":
+            total = 2500
+
+    if mock:
+        for x in range(6):
+            v = catResult[x]
+            if ((v["Type"] == "SalesMeeting" and perc(v["Duration"], total) >= 10)
+                    and (v["Type"] == "TeamMeeting" and perc(v["Duration"], total) >= 40)
+                    and (v["Type"] == "Vacations" and perc(v["Duration"], total) >= 10)
+                    and (v["Type"] == "TeamActivity" and perc(v["Duration"], total) >= 10)
+                    and (v["Type"] == "Training" and perc(v["Duration"], total) >= 10)):
+                isDataValid = isDataValid and True
+            elif v["Type"] == "Vacations" and perc(v["Duration"], total) >= 80:
+                break
+            else:
+                isDataValid = isDataValid and False
+                if v["Type"] == "SalesMeeting":
+                    v["Duration"] = (randomize(15, 5, 2) / 10) * total
+                elif v["Type"] == "TeamMeeting":
+                    v["Duration"] = (randomize(20, 5, -3) / 10) * total
+                elif v["Type"] == "Vacations":
+                    v["Duration"] = (randomize(10, 5, -3) / 10) * total
+                elif v["Type"] == "TeamActivity":
+                    v["Duration"] = (randomize(15, 5) / 10) * total
+                elif v["Type"] == "Training":
+                    v["Duration"] = (randomize(10, 3) / 10) * total
+                elif v["Type"] == "Tool":
+                    v["Duration"] = (randomize(30, 5) / 10) * total
 
     return {
         "CatData": catResult,
